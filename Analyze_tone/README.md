@@ -2,7 +2,7 @@
 ## A Praat script for tonal exploration and analysis.
 
 To cite this script and manual:
-- Ring, Hiram. 2017. Analyze Tone and Plot: A Praat script for tonal exploration and analysis. Url: http://github.com/lingdoc/praatscripts/Analyze_tone.
+- Ring, Hiram. 2017. Analyze Tone and Plot: A Praat script for tonal exploration and analysis. Url: http://github.com/lingdoc/praatscripts/tree/master/Analyze_tone.
 
 This script:
 Extracts duration and F0 across a duration defined by the TextGrid for a wav file.
