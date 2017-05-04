@@ -15,25 +15,37 @@ This script has two main processes, the *segmentation/analysis* process and the 
 ### The option 'Plot_only' skips the analysis portion and goes directly to the second process. This is useful if you don't want to re-run the first process.
 
 Crucially, options for the second process are constrained by the user's choice in the first form/window. The key selections are:
+
   **labeled_tier_number:**
+
 	- this tells the script which tier of your TextGrid to search for segmented tone categories
+
   **Analysis_type:**
+
 	- this tells the script whether you want to output raw data to a tab-delimited CSV file, or if you want to plot the tones in the Praat picture window. Options are explained further below.
+
          - *Raw for CSV* = you want the raw pitch measurements at set increments over time.
+
          - *Percentage for CSV* = you want pitch measurements at set percentages over time.
+
          - *Normalize for Drawing* = you want individual tone sound files for each segmented tone. This option is good for plotting all the pitch traces in your data in order to explore things like length and pitch height. It also creates a single normalized WAV file Based on all the labeled segments in the "labeled_tier_number" identified above.
+
          - *Normalize by tone for Drawing* = you want individual tone sound files, but organized by label. This option is good if you've mostly identified the tonal categories in your data, as it creates a single normalized sound file for each tonal category, based on the properties of the labeled segments in each category.
+
 				 - *Plot only* = you already have tonal audio files in the folder and you just want to plot them.
 
 ### A few other notes worth mentioning regarding the other options:
 
   *"Analysis_points_time_step"*
+
 	- defines the increment (in seconds) at which raw measurements are taken. This means that segments in your TextGrids may be of differing lengths. As noted above, the measurements are only taken in the tier number identified, and only of TextGrid segments that have been labeled; empty/unlabeled segments and other tiers will be ignored.
 
   *"Number_of_intervals"*
+
 	- refers to the number of interval values extracted within a single label. Defaults are currently set at tier '2', and taken every '0.01' seconds (10ms) for '50' intervals. With these defaults the F0 will be measured every 10ms from the start of the textgrid, a total of 50 times, or 500 ms (50 x 10ms = 500ms). This should be long enough for most tone-bearing-units. This will require some fine-tuning by the user for their particular data set, as different users will want to measure segments of differing lengths. It also requires the user to segment their textgrid according to what they want to measure, but allows for some flexibility.
 
   *"Percentage_increments"*
+	
 	- defines the locations within the label to sample for pitch when the user prefers a more normalized analysis. If at '10' (the current default), for example, the audio will be sampled at 10 equidistant points within the label, or at 10 percent increments. If at '20', the audio will be sampled at 20 equidistant points, or at 5 percent increments.
 
  **The "Percentage_increments" value is used by both 'Normalize' options.**
