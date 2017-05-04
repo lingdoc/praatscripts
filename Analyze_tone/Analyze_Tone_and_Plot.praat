@@ -30,7 +30,6 @@
 # This form allows the user to set parameters.
 # Changing the numbers in the script below will change the default parameters.
 form Extract Pitch data from labelled points
-  ; boolean Only_plot 0
   sentence Directory_name: new/
   sentence Sound_file_extension: .wav
   positive Labeled_tier_number 2
@@ -40,11 +39,6 @@ form Extract Pitch data from labelled points
     option Normalize for Drawing
     option Normalize by tone for Drawing
     option Only plot
-  ;  choice Analysis_type 4
-  ;     button Raw for CSV
-  ;     button Percentage for CSV
-  ;     button Normalize for Drawing
-  ;     button Normalize by tone for Drawing
   comment Settings for raw measurement:
   positive Analysis_points_time_step_in_seconds 0.01
   positive Number_of_intervals 50
@@ -62,41 +56,51 @@ form Extract Pitch data from labelled points
   positive Sampling_quality 50
 endform
 
-# The following part of the script finds all wav files in the specified directory, and does
-# analysis on the file if it has a corresponding TextGrid with the same name.
-# If your sound files are in a different format, you can insert that format instead of wav below.
-
 pitch_redraw = 1
 
-; if only_plot = 1
-;   if analysis_type = 3
-;     normDir$ = directory_name$
-;     newDir$ = directory_name$
-;     fileNameNoWav$ = "File"
-;     label$ = "Label"
-;     call drawPitch
-;   elsif analysis_type = 4
-;     normDir$ = directory_name$
-;     newDir$ = directory_name$
-;     fileNameNoWav$ = "File"
-;     label$ = "Label"
-;     call drawPitch
-;   else
-;     #do nothing
-;   endif
-; else
+if analysis_type = 1
+  # do nothing
+  call makeWAVs
+elsif analysis_type = 2
+  # do nothing
+  call makeWAVs
+elsif analysis_type = 5
+  normDir$ = directory_name$
+  newDir$ = directory_name$
+  fileNameNoWav$ = "File"
+  label$ = "Label"
+  call drawPitch
+  the_loop = 1
 
+  while the_loop = 1
+    call reset
+  endwhile
+else
+  call makeWAVs
+  call drawPitch
+  call draw_and_plot
+
+  the_loop = 1
+
+  while the_loop = 1
+    call reset
+  endwhile
+endif
+
+# End of main script. The rest of the script defines procedures.
+
+# This procedure finds all wav files in the specified directory, and does
+# analysis on the file if it has a corresponding TextGrid with the same name.
 #-----------------
 procedure makeWAVs
-  Create Strings as file list... list 'directory_name$'*.wav
+  Create Strings as file list... list 'directory_name$'*'sound_file_extension$'
   num = Get number of strings
   select Strings list
   for ifile to num
-    ; select Strings list
   	fileName$ = Get string... ifile
   	Read from file... 'directory_name$''fileName$'
     fileNameNoWav$ = fileName$ - ".wav"
-    soundName$ = directory_name$ + fileName$ - ".wav"
+    soundName$ = directory_name$ + fileName$ - sound_file_extension$
     csvName$ = soundName$ + ".csv"
     textGridname$ = soundName$ + ".TextGrid"
     select Sound 'fileNameNoWav$'
@@ -141,7 +145,6 @@ procedure makeWAVs
       select 'textGridID'
       Remove
       select 'soundID1'
-      ; plus 'soundID2'
       Remove
     endif
     select Strings list
@@ -151,44 +154,8 @@ procedure makeWAVs
   Remove
 endproc
 
-; endif
-
-if analysis_type = 1
-  # do nothing
-  call makeWAVs
-elsif analysis_type = 2
-  # do nothing
-  call makeWAVs
-elsif analysis_type = 5
-  normDir$ = directory_name$
-  newDir$ = directory_name$
-  fileNameNoWav$ = "File"
-  label$ = "Label"
-  call drawPitch
-  the_loop = 1
-
-  while the_loop = 1
-    call reset
-  endwhile
-else
-  call makeWAVs
-  call drawPitch
-  call draw_and_plot
-  ; endif
-
-  the_loop = 1
-
-  while the_loop = 1
-    call reset
-  endwhile
-endif
-
-; if Strings pitchfiles <> ""
-;   select Strings pitchfiles
-;   Remove
-; endif
-# End of main script. The rest of the script defines procedures.
-
+# This procedure does analysis on files in the folder according to timesteps
+# and outputs the results for each file to a CSV.
 #-----------------
 procedure analyzeRaw
   numintervals = number_of_intervals
@@ -225,8 +192,6 @@ procedure analyzeRaw
         createDirectory: newDir$
         Save as WAV file... 'newDir$''label$'_'fileNameNoWav$'_'labelcount'.wav
         fileappend 'csvName$' 'dur''tab$'
-        #chunkID  = steps * numintervals
-        #chunkID  = (intvl_end-intvl_start)/numintervals
 
         #Pitch analysis
         select 'intID'
@@ -255,6 +220,8 @@ procedure analyzeRaw
   endfor
 endproc
 
+# This procedure does analysis on files in the folder according to percentage
+# increments and outputs the results for each file to a CSV.
 #-----------------
 procedure analyzePerc
   numintervals = percentage_increments
@@ -264,7 +231,6 @@ procedure analyzePerc
   for q to numintervals
     start = (q-1) * size
     end = q * size
-    # for display of timestep in seconds, uncomment the following two lines:
     val_F0 = start
     fileappend 'csvName$' 'val_F0''tab$'
   endfor
@@ -287,8 +253,6 @@ procedure analyzePerc
         createDirectory: newDir$
         Save as WAV file... 'newDir$''label$'_'fileNameNoWav$'_'labelcount'.wav
         fileappend 'csvName$' 'dur''tab$'
-        #chunkID  = steps * numintervals
-        #chunkID  = (intvl_end-intvl_start)/numintervals
 
         #Pitch analysis
         select 'intID'
@@ -320,6 +284,9 @@ procedure analyzePerc
   endfor
 endproc
 
+# This procedure does analysis on files in the folder according to percentage
+# and creates a WAV file for all files in the folder that is normalized
+# according to pitch height and duration.
 #-----------------
 procedure analyzeNorm
   numintervals = percentage_increments
@@ -369,7 +336,6 @@ procedure analyzeNorm
         # Dicanio percentage
         size = dur/numintervals
 
-
         for q to numintervals
           start = (q-1) * size
           end = q * size
@@ -395,11 +361,8 @@ procedure analyzeNorm
       endif
   endfor
   durnorm = durtotal/labelcount
-  ; printline 'durnorm'
   for q to numintervals
     int'q' = int'q'/labelcount
-    ; type = int'q'
-    ; printline Step_'q' is 'type'
   endfor
 
   newDir$ = "'directory_name$''fileNameNoWav$'/"
@@ -423,11 +386,8 @@ procedure analyzeNorm
   endwhile
 
   Read from file... 'fileforAdj$'
-  ; select Sound 'newfileName$'
   Extract part... 0.0 durnorm Rectangular 1 no
   Rename... Norm
-  ; select Sound 'newfileName$'
-  ; Remove
 
   Create PitchTier... Norm 0.0 durnorm
   select PitchTier Norm
@@ -450,6 +410,9 @@ procedure analyzeNorm
   Remove
 endproc
 
+# This procedure does analysis on files in the folder according to percentage
+# and creates a WAV file for all files in the folder that are have the same label.
+# Each label WAV file is normalized according to pitch height and duration.
 #-----------------
 procedure analyzeNormTone
   numintervals = percentage_increments
@@ -462,14 +425,11 @@ procedure analyzeNormTone
     start = (q-1) * size
     end = q * size
     int'q' = int
-    # for display of timestep in seconds, uncomment the following two lines:
     val_F0 = start
     fileappend 'csvName$' 'val_F0''tab$'
   endfor
   fileappend 'csvName$' 'newline$'
 
-
-  ; interval$ = 0
   for lab to labconds
     durtotal = 0
     labelcount = 0
@@ -483,7 +443,6 @@ procedure analyzeNormTone
         intvl_start = Get starting point... labeled_tier_number i
         intvl_end = Get end point... labeled_tier_number i
         select 'soundID1'
-        ; i_act = i/2
         Extract part... intvl_start intvl_end Rectangular 1 no
         intID = selected("Sound")
         dur = Get total duration
@@ -493,8 +452,6 @@ procedure analyzeNormTone
         createDirectory: newDir$
         Save as WAV file... 'newDir$''label$'_'fileNameNoWav$'_'labelcount'.wav
         fileappend 'csvName$' 'dur''tab$'
-        #chunkID  = steps * numintervals
-        #chunkID  = (intvl_end-intvl_start)/numintervals
 
         #Pitch analysis
         select 'intID'
@@ -531,14 +488,11 @@ procedure analyzeNormTone
       endif
     endfor
     durnorm = durtotal/labelcount
-    ; printline 'durnorm'
     for q to numintervals
       int'q' = int'q'/labelcount
       type = int'q'
-      ; printline Step_'q' is 'type'
     endfor
 
-    ; newDir$ = "'directory_name$'test2/"
     Create Strings as file list... newlist 'newDir$'/*.wav
     newnum = Get number of strings
     fileforAdj$ = ""
@@ -587,6 +541,8 @@ procedure analyzeNormTone
   endfor
 endproc
 
+# This procedure finds all the labels in the tone-annotated TextGrid tier and
+# outputs the labels to a window for the user's verification.
 #-----------------
 procedure findLabels
   ; labconds = 0
@@ -622,11 +578,9 @@ procedure findLabels
       labLatest$ = labcond$
     endif
   endfor
-  ; printline 'labconds'
 
   for lab to labconds
     thisone$ = labcond'lab'$
-    ; printline Label_'lab': 'thisone$'
   endfor
 
   theTextGrid$ = selected$("TextGrid")
@@ -645,9 +599,10 @@ procedure findLabels
     endif
 endproc
 
+# This procedure gets the initial settings for drawing the pitch tracks.
 #-----------------
 procedure drawPitch
-  sound_file_extension$ = ".wav"
+  ; sound_file_extension$ = ".wav"
   pitch_file_extension$ = ".Pitch"
   time_step = 0.01
   default_minimum_pitch = 60
@@ -783,6 +738,7 @@ endproc
   #S2	120	300
   # etc.
 
+# This procedure actually draws the pitch tracks.
 #--------------
 procedure draw_and_plot
 	echo Drawing pitch curves for sound files in 'sound_file_directory$'...
@@ -876,6 +832,8 @@ procedure draw_and_plot
 
 	filenumber = 0
 	colour = 0
+  ; The script was modified to not output the color Black for pitch tracks.
+  ; See Mietta Lennes' script for the original form.
 	; colour$ = "Black"
 	colour$ = "Red"
 	style = 0
@@ -896,7 +854,6 @@ procedure draw_and_plot
 	for ifile to numberOfSoundFiles
 		soundfilename$ = Get string... ifile
     filename$ = soundfilename$ - sound_file_extension$
-		; filename$ = left$ (soundfilename$, (length (soundfilename$) - length (sound_file_extension$)))
 		pitchfilepath$ = sound_file_directory$ + filename$ + pitch_file_extension$
     if pitch_redraw = 0
   		if fileReadable (pitchfilepath$)
@@ -917,7 +874,6 @@ procedure draw_and_plot
   		endif
   		# Calculate and save pitch
   		To Pitch... time_step min_pitch max_pitch
-      ; pitchID2 = selected("Pitch")
   		Write to short text file... 'pitchfilepath$'
   		Remove
   		select Sound 'filename$'
@@ -925,8 +881,6 @@ procedure draw_and_plot
   			call PreAnalysis
   		endif
   		Remove
-      ; select 'pitchID2'
-      ; Remove
   	endif
 		filenumber = filenumber + 1
 		text'filenumber'$ = ""
@@ -935,7 +889,6 @@ procedure draw_and_plot
 
 	# Remove the sound file list:
 	Remove
-; endif
 
 	# Build a new list of Pitch files:
 	Create Strings as file list... pitchfiles 'sound_file_directory$'*'pitch_file_extension$'
@@ -952,7 +905,6 @@ procedure draw_and_plot
 		dur = Get total duration
 		filenumber = filenumber + 1
     filename$ = pitchfilename$ - pitch_file_extension$
-		; filename$ = left$ (pitchfilename$, (length (pitchfilename$) - length (pitch_file_extension$)))
 		if group_id$ <> ""
 			call GetConditionFromFilename
 		elsif line_style = 1
@@ -969,10 +921,8 @@ procedure draw_and_plot
 		endif
 		select Pitch 'filename$'
 		call Drawing
-    ; Remove
     select Pitch 'filename$'
 		call SaveStatistics
-    ; select Pitch 'filename$'
     Remove
 		select Strings pitchfiles
 	endfor
@@ -1012,17 +962,13 @@ procedure draw_and_plot
 
 	select Strings pitchfiles
 	Remove
-	; select Strings pitchfiles
-	; Remove
-	; select all Pitch
-	; Remove
 
 	printline 'filenumber' F0 curves were drawn and saved to 'picture_file$'.
 	printline Finished!
 endproc
 
-#--------------
 # This procedure creates the repeating plot window
+#--------------
 procedure reset
   # including these variable definitions allows the plot window to save settings from previous runs
   wav_folder$ = sound_file_directory$
@@ -1033,11 +979,6 @@ procedure reset
 	hz_markers = hz_time_step
 	seconds_markers = seconds_time_step
   redraw_pitch = pitch_redraw
-  ; norm_time = normalize_time
-  ; freq_scale = frequency_scale_for_the_picture
-  ; draw_type = draw_as
-  ; line_type = line_style
-  ; smooth_pitch = smooth_pitch_curves
 
 	beginPause: "Adjust parameters"
     comment: "File parameters"
@@ -1128,9 +1069,7 @@ procedure reset
 
 endproc
 
-#select all
-#Remove
-
+# This procedure runs a simple duration query for the pitch track.
 #--------------
 procedure PreAnalysis
 
@@ -1141,7 +1080,7 @@ endif
 
 endproc
 
-
+# This procedure actually plots the pitches.
 #--------------
 procedure Drawing
 
@@ -1252,13 +1191,10 @@ endif
 
 Line width... 2
 
-; select Pitch 'filename$'
-; Remove
-
 endproc
 
+# This procedure switches colours between labels.
 #------------
-
 procedure SwitchColours
 
 if colour = 1
@@ -1320,8 +1256,8 @@ endif
 
 endproc
 
+# This procedure switches line styles between labels.
 #------------
-
 procedure SwitchLineStyles
 
 if style = 1
@@ -1348,9 +1284,9 @@ else
 	Plain line
 endif
 
-
 endproc
 
+# This procedure draws the background and frame of the plot.
 #---------------
 procedure PictureWindow
 
@@ -1388,7 +1324,7 @@ endif
 endproc
 
 
-
+# This procedure saves the statistics of each plot to a text file.
 #-----------------
 procedure SaveStatistics
 
@@ -1414,18 +1350,14 @@ procedure SaveStatistics
     Remove
     select 'pitchID3'
   endif
-  ; select Pitch 'filename$'
-  ; Remove
-	; select Pitch 'filename$'
 
 endproc
 
-
+# This procedure gets the label from the filename of the soundfile.
+# This needs to be updated to function as well as the findLabels procedure.
 #-----------------
 procedure GetConditionFromFilename
 
-	; colour = 0
-	; style = 0
 	condition$ = 'group_id$'
 	if condition$ <> latestcondition$
 		# check if the group was already encountered
@@ -1479,7 +1411,8 @@ procedure GetConditionFromFilename
 
 endproc
 
-
+# This procedure gets all the parameters necessary for Praat's automatic
+# pitch identification from a file, if a file exists with this information.
 #-----------------
 procedure GetPitchParameters
 
