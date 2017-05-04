@@ -1,8 +1,7 @@
-<Analyze_Tone_and_Plot.praat>
-(from ...)
+# <Analyze_Tone_and_Plot.praat>
+### (from http://github.com/lingdoc/praatscripts/tree/master/Analyze_tone)
 
-This script has two main processes, the segmentation/analysis process and the
-drawing process.
+### This script has two main processes, the segmentation/analysis process and the drawing process.
 
 In the segmentation and analysis process, the script:
 	1) uses WAV/TextGrid pairs to track pitch values of segments incrementally
@@ -11,7 +10,7 @@ In the segmentation and analysis process, the script:
 
 In the (second) drawing process, the script:
 	1) plots the pitch of sound files that have been grouped together
-	2) allows the user to re-draw sets of sound files with differing plot 
+	2) allows the user to re-draw sets of sound files with differing plot
 	criteria
 
 The option 'Plot_only' skips the analysis portion and goes directly to the second
