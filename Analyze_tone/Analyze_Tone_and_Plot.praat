@@ -29,7 +29,7 @@
 
 # This form allows the user to set parameters.
 # Changing the numbers in the script below will change the default parameters.
-form Extract Pitch data from labelled points
+form Extract Pitch data from labeled points
   sentence Directory_name: new/
   sentence Sound_file_extension: .wav
   positive Labeled_tier_number 2
@@ -299,6 +299,7 @@ procedure analyzeNorm
     start = (q-1) * size
     end = q * size
     int'q' = int
+    dataexist'q' = int
     # for display of timestep in seconds, uncomment the following two lines:
     val_F0 = start
     fileappend 'csvName$' 'val_F0''tab$'
@@ -307,7 +308,13 @@ procedure analyzeNorm
 
   durtotal = 0
   labelcount = 0
-  ; interval$ = 0
+  ; Create a table for each label, named i.e. 'label_1' etc, with one row and as many columns as intervals # string$(1)
+  Create Table with column names: "label_'lab'", 1, "dur"
+  tableID = selected("Table")
+  for numint to numintervals
+    Append column: string$(numint)
+  endfor
+  select 'textGridID'
 
   for i to num_labels
     select 'textGridID'
@@ -315,6 +322,17 @@ procedure analyzeNorm
       if label$ <> ""
         labelcount = labelcount + 1
         fileappend 'csvName$' 'label$''tab$'
+        ; select the table
+        select 'tableID'
+        if labelcount > 1
+          ; append a new row
+          Append row
+        else
+          ; do nothing
+        endif
+        ; select the current textGrid
+        select 'textGridID'
+
         intvl_start = Get starting point... labeled_tier_number i
         intvl_end = Get end point... labeled_tier_number i
         select 'soundID1'
@@ -325,18 +343,23 @@ procedure analyzeNorm
         createDirectory: newDir$
         Save as WAV file... 'newDir$''label$'_'fileNameNoWav$'_'labelcount'.wav
         fileappend 'csvName$' 'dur''tab$'
+        ; select the table
+        select 'tableID'
+        ; set the numeric value of the current label's duration
+        Set numeric value: labelcount, "dur", dur
 
         #Pitch analysis
         select 'intID'
         To Pitch... 0 f0_minimum f0_maximum
         pitchID = selected("Pitch")
 
-        durtotal = durtotal + dur
+        ; durtotal = durtotal + dur
 
         # Dicanio percentage
         size = dur/numintervals
 
         for q to numintervals
+          dataexist = 0
           start = (q-1) * size
           end = q * size
           val_F0 = Get mean... start end Hertz
@@ -345,9 +368,20 @@ procedure analyzeNorm
             start = q * size
             end = (q+1) * size
             val_F0 = Get mean... start end Hertz
+            ; select the table
+            select 'tableID'
+            ; set the numeric value of the current label
+            Set numeric value: labelcount, string$(q), val_F0
+            select 'pitchID'
           else
             fileappend 'csvName$' 'val_F0''tab$'
-          int'q' = int'q' + val_F0
+            ; select the table
+            select 'tableID'
+            ; set the numeric value of the current label
+            Set numeric value: labelcount, string$(q), val_F0
+            select 'pitchID'
+            ; dataexist'q' = dataexist'q' + 1
+          ; int'q' = int'q' + val_F0
           endif
         endfor
         fileappend 'csvName$' 'newline$'
@@ -356,14 +390,20 @@ procedure analyzeNorm
         Remove
         select 'intID'
         Remove
-      else
-        #do nothing
       endif
   endfor
-  durnorm = durtotal/labelcount
+  select 'tableID'
+  @colMeanNARM: "dur"
+  durnorm = colMeanNARM.return
+
+  select 'tableID'
   for q to numintervals
-    int'q' = int'q'/labelcount
+    col$ = string$(q)
+    @colMeanNARM: col$
+    int'q' = colMeanNARM.return
   endfor
+  select 'tableID'
+  Remove
 
   newDir$ = "'directory_name$''fileNameNoWav$'/"
   Create Strings as file list... newlist 'newDir$'*.wav
@@ -425,6 +465,8 @@ procedure analyzeNormTone
     start = (q-1) * size
     end = q * size
     int'q' = int
+    ; dataexist'q' = dataexist
+    ; valexist'q' = int
     val_F0 = start
     fileappend 'csvName$' 'val_F0''tab$'
   endfor
@@ -433,13 +475,33 @@ procedure analyzeNormTone
   for lab to labconds
     durtotal = 0
     labelcount = 0
+    ; Create a table for each label, named i.e. 'label_1' etc, with one row and as many columns as intervals
+    Create Table with column names: "label_'lab'", 1, "dur"
+    tableID = selected("Table")
+    for numint to numintervals
+      Append column: string$(numint)
+    endfor
+    select 'textGridID'
+
     for i to num_labels
       select 'textGridID'
       label$ = Get label of interval... labeled_tier_number i
       labelCondition$ = labcond'lab'$
+
       if label$ = labelCondition$
         labelcount = labelcount + 1
         fileappend 'csvName$' 'label$''tab$'
+        ; select the table
+        select 'tableID'
+        if labelcount > 1
+          ; append a new row
+          Append row
+        else
+          ; do nothing
+        endif
+        ; select the current textGrid
+        select 'textGridID'
+
         intvl_start = Get starting point... labeled_tier_number i
         intvl_end = Get end point... labeled_tier_number i
         select 'soundID1'
@@ -452,6 +514,10 @@ procedure analyzeNormTone
         createDirectory: newDir$
         Save as WAV file... 'newDir$''label$'_'fileNameNoWav$'_'labelcount'.wav
         fileappend 'csvName$' 'dur''tab$'
+        ; select the table
+        select 'tableID'
+        ; set the numeric value of the current label's duration
+        Set numeric value: labelcount, "dur", dur
 
         #Pitch analysis
         select 'intID'
@@ -473,10 +539,23 @@ procedure analyzeNormTone
             start = q * size
             end = (q+1) * size
             val_F0 = Get mean... start end Hertz
+            ; select the table
+            select 'tableID'
+            ; set the numeric value of the current label
+            Set numeric value: labelcount, string$(q), val_F0
+            select 'pitchID'
           else
             fileappend 'csvName$' 'val_F0''tab$'
-          int'q' = int'q' + val_F0
-          theone = int'q'
+            ; select the table
+            select 'tableID'
+            ; set the numeric value of the current label
+            Set numeric value: labelcount, string$(q), val_F0
+            select 'pitchID'
+          ;   dataexist'q' = dataexist'q' + 1
+          ;   ; valexist'q' = valexist'q' + 1
+          ; int'q' = int'q' + val_F0
+          ; ; theone = int'q'
+
           endif
         endfor
         fileappend 'csvName$' 'newline$'
@@ -487,11 +566,18 @@ procedure analyzeNormTone
         Remove
       endif
     endfor
-    durnorm = durtotal/labelcount
+    select 'tableID'
+    @colMeanNARM: "dur"
+    durnorm = colMeanNARM.return
+
+    select 'tableID'
     for q to numintervals
-      int'q' = int'q'/labelcount
-      type = int'q'
+      col$ = string$(q)
+      @colMeanNARM: col$
+      type'q' = colMeanNARM.return
     endfor
+    select 'tableID'
+    Remove
 
     Create Strings as file list... newlist 'newDir$'/*.wav
     newnum = Get number of strings
@@ -522,7 +608,8 @@ procedure analyzeNormTone
     size = durnorm/numintervals
     for q to numintervals
       spot = q * size
-      Add point... spot int'q'
+      ; Add point... spot int'q'
+      Add point... spot type'q'
     endfor
     select Sound Norm
     To Manipulation... analysis_points_time_step_in_seconds f0_minimum f0_maximum
@@ -539,6 +626,16 @@ procedure analyzeNormTone
     select 'soundID03'
     Remove
   endfor
+endproc
+
+# This procedure gets means from columns while ignoring bad values
+#-----------------
+procedure colMeanNARM: .col$
+  .id = selected("Table")
+  .subset = Extract rows where column (text): .col$, "is not equal to", "--undefined--"
+  .return = Get mean: .col$
+  removeObject: .subset
+  selectObject: .id
 endproc
 
 # This procedure finds all the labels in the tone-annotated TextGrid tier and
@@ -1267,17 +1364,17 @@ elsif style = 2
 	Line width... 3
 	Dashed line
 elsif style = 3
-	Line width... 4
-	Plain line
+	Line width... 3
+	Dotted line
 elsif style = 4
-	Line width... 4
-	Dashed line
+	Line width... 5
+	Plain line
 elsif style = 5
 	Line width... 5
-	Plain line
+	Dashed line
 elsif style = 6
 	Line width... 5
-	Dashed line
+	Dotted line
 else
 	style = 1
 	Line width... 3
