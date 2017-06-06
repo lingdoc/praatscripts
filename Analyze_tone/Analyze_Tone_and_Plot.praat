@@ -32,7 +32,7 @@
 # This form allows the user to set parameters.
 # Changing the numbers in the script below will change the default parameters.
 form Extract Pitch data from labeled points
-  sentence Directory_name: new/
+  sentence Directory_name: 
   sentence Sound_file_extension: .wav
   positive Labeled_tier_number 2
   optionmenu Analysis_type: 5
