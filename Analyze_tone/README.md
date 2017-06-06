@@ -17,22 +17,20 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 
 A copy of the GNU General Public License can be found at <http://www.gnu.org/licenses/>.
 
-Based in part on Praat scripts by Christian DiCanio, 2012 & 2013: <http://www.acsu.buffalo.edu/~cdicanio/scripts.html>,
-borrowing from scripts by Mietta Lennes, 2006: <http://www.helsinki.fi/~lennes/praat-scripts/public/>,
-and following the excellent tutorials at <http://praatscripting.lingphon.net/>.
+Based in part on Praat scripts by Christian DiCanio, 2012 & 2013: <http://www.acsu.buffalo.edu/~cdicanio/scripts.html>, borrowing from scripts by Mietta Lennes, 2006: <http://www.helsinki.fi/~lennes/praat-scripts/public/>, and following the excellent tutorials at <http://praatscripting.lingphon.net/>. Normalization uses tables, and makes use of José Joaquín Atria’s procedure for ignoring NA values in tables: <http://uk.groups.yahoo.com/neo/groups/praat-users/conversations/topics/>.
 
 ## Detailed description
 
 This script has two main processes, the **segmentation/analysis** process and the **drawing** process.
 
 ### Segmentation and Analysis:
-This script:
+
 1. uses WAV/TextGrid pairs to track pitch values of segments incrementally according to time-steps or percentage.
 2. places the measurements in a CSV for further analysis.
 3. saves the segments in subfolders for the second process.
 
 ### Drawing:
-This script:
+
 1. plots the pitch of sound files that have been grouped together.
 2. allows the user to re-draw sets of sound files with differing plot/analysis criteria.
 

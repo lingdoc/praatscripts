@@ -22,6 +22,8 @@
 #    Borrowing from scripts by Mietta Lennes, 2006.
 #    <http://www.helsinki.fi/~lennes/praat-scripts/public/>
 #    And following the excellent tutorials at <http://praatscripting.lingphon.net/>.
+#    Normalization uses José Joaquín Atria’s procedure for ignoring NA values.
+#    <http://uk.groups.yahoo.com/neo/groups/praat-users/conversations/topics/>
 #
 #    A more detailed description of this script is found at <http://github.com/lingdoc/praatscripts/tree/master/Analyze_tone>.
 #
