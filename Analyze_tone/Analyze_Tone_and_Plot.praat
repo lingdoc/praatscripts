@@ -32,10 +32,10 @@
 # This form allows the user to set parameters.
 # Changing the numbers in the script below will change the default parameters.
 form Extract Pitch data from labeled points
-  sentence Directory_name: 
+  sentence Directory_name:
   sentence Sound_file_extension: .wav
   positive Labeled_tier_number 2
-  optionmenu Analysis_type: 5
+  optionmenu Analysis_type: 4
     option Raw for CSV
     option Percentage for CSV
     option Normalize for Drawing
@@ -720,37 +720,37 @@ procedure drawPitch
   if analysis_type = 1
     ; call analyzeRaw
     sound_file_directory$ = "'newDir$'"
-    picture_file$ = "'directory_name$''fileNameNoWav$'.pdf"
+    picture_file$ = "'directory_name$''fileNameNoWav$'.png"
     pitch_data_file$ = "'directory_name$''fileNameNoWav$'.txt"
   elsif analysis_type = 2
     ; call analyzePerc
     sound_file_directory$ = "'newDir$'"
-    picture_file$ = "'directory_name$''fileNameNoWav$'.pdf"
+    picture_file$ = "'directory_name$''fileNameNoWav$'.png"
     pitch_data_file$ = "'directory_name$''fileNameNoWav$'.txt"
   elsif analysis_type = 3
     ; call analyzeNorm
     sound_file_directory$ = "'newDir$'"
-    picture_file$ = "'directory_name$''fileNameNoWav$'_norm.pdf"
+    picture_file$ = "'directory_name$''fileNameNoWav$'_norm.png"
     pitch_data_file$ = "'directory_name$''fileNameNoWav$'_norm.txt"
   elsif analysis_type = 4
     ; call findLabels
     ; call analyzeNormTone
     sound_file_directory$ = "'normDir$'"
-    picture_file$ = "'directory_name$''fileNameNoWav$'_'label$'_norm.pdf"
+    picture_file$ = "'directory_name$''fileNameNoWav$'_'label$'_norm.png"
     pitch_data_file$ = "'directory_name$''fileNameNoWav$'_'label$'_norm.txt"
   elsif analysis_type = 5
     ; call findLabels
     ; call analyzeNormTone
     sound_file_directory$ = "'normDir$'"
-    picture_file$ = "'directory_name$''fileNameNoWav$'_'label$'_norm.pdf"
+    picture_file$ = "'directory_name$''fileNameNoWav$'_'label$'_norm.png"
     pitch_data_file$ = "'directory_name$''fileNameNoWav$'_'label$'_norm.txt"
   endif
 
   beginPause: "Draw pitch curves from all sound files in a directory"
   	comment: "Sound file directory (use '*_norm' to plot normalized):"
-  	text: "Sound file directory", sound_file_directory$
-  	sentence: "Sound file extension", sound_file_extension$
-  	sentence: "Pitch file extension", pitch_file_extension$
+  	sentence: "Sound file directory", sound_file_directory$
+  	; sentence: "Sound file extension", sound_file_extension$
+  	; sentence: "Pitch file extension", pitch_file_extension$
   	boolean: "Normalize time", normalize_time
   	optionMenu: "Frequency scale for the picture", frequency_scale_for_the_picture
   		option: "Linear (Hertz)"
@@ -772,15 +772,16 @@ procedure drawPitch
   	real: "Time step", time_step
   	real: "Default minimum pitch", default_minimum_pitch
   	real: "Default maximum pitch", default_maximum_pitch
-  	comment: "Pitch parameter file (optional):"
-  	text: "Pitch parameter file (optional)", pitch_parameter_file$
+  	; comment: "Pitch parameter file (optional):"
+  	; text: "Pitch parameter file (optional)", pitch_parameter_file$
+    comment: "Plot parameters:"
   	positive: "Minimum pitch for drawing", minimum_pitch_for_drawing
   	positive: "Maximum pitch for drawing", maximum_pitch_for_drawing
   	positive: "Hz time step", hz_time_step
   	positive: "Seconds time step", seconds_time_step
-  	comment: "Output files:"
-  	text: "Picture file", picture_file$
-  	text: "Pitch data file", pitch_data_file$
+  	; comment: "Output files:"
+  	sentence: "Picture file", picture_file$
+  	sentence: "Pitch data file", pitch_data_file$
   clicked = endPause: "Stop", "Continue", 2, 1
   if clicked = 1
     exitScript ()
@@ -1057,7 +1058,8 @@ procedure draw_and_plot
 	endif
 
 	Viewport... 0 7 0 textpos2
-	Write to PDF file... 'picture_file$'
+  ;Write to PDF file... 'picture_file$' ; This function only works on Mac, the function below works on both
+	Save as 600-dpi PNG file... 'picture_file$'
 
 	select Strings pitchfiles
 	Remove
@@ -1080,10 +1082,10 @@ procedure reset
   redraw_pitch = pitch_redraw
 
 	beginPause: "Adjust parameters"
-    comment: "File parameters"
-    text: "Wav folder", wav_folder$
-    text: "Image file", image_file$
-    text: "Data file", data_file$
+    ; comment: "File parameters"
+    sentence: "Sound file directory", wav_folder$
+    sentence: "Picture file", image_file$
+    sentence: "Pitch data file", data_file$
     boolean: "Normalize time", normalize_time
   	optionMenu: "Frequency scale for the picture", frequency_scale_for_the_picture
   		option: "Linear (Hertz)"
