@@ -748,7 +748,7 @@ procedure drawPitch
 
   beginPause: "Draw pitch curves from all sound files in a directory"
   	comment: "Sound file directory (use '*_norm' to plot normalized):"
-  	sentence: "Sound file directory", sound_file_directory$
+  	text: "Sound file directory", sound_file_directory$
   	; sentence: "Sound file extension", sound_file_extension$
   	; sentence: "Pitch file extension", pitch_file_extension$
   	boolean: "Normalize time", normalize_time
@@ -779,9 +779,9 @@ procedure drawPitch
   	positive: "Maximum pitch for drawing", maximum_pitch_for_drawing
   	positive: "Hz time step", hz_time_step
   	positive: "Seconds time step", seconds_time_step
-  	; comment: "Output files:"
-  	sentence: "Picture file", picture_file$
-  	sentence: "Pitch data file", pitch_data_file$
+  	comment: "Output files:"
+  	text: "Picture file", picture_file$
+  	text: "Pitch data file", pitch_data_file$
   clicked = endPause: "Stop", "Continue", 2, 1
   if clicked = 1
     exitScript ()
@@ -1082,10 +1082,10 @@ procedure reset
   redraw_pitch = pitch_redraw
 
 	beginPause: "Adjust parameters"
-    ; comment: "File parameters"
-    sentence: "Sound file directory", wav_folder$
-    sentence: "Picture file", image_file$
-    sentence: "Pitch data file", data_file$
+    comment: "File parameters (directory, image, datafile):"
+    text: "Sound file directory", wav_folder$
+    text: "Picture file", image_file$
+    text: "Pitch data file", data_file$
     boolean: "Normalize time", normalize_time
   	optionMenu: "Frequency scale for the picture", frequency_scale_for_the_picture
   		option: "Linear (Hertz)"
