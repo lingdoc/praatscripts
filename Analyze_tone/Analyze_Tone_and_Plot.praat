@@ -101,7 +101,7 @@ procedure makeWAVs
   for ifile to num
   	fileName$ = Get string... ifile
   	Read from file... 'directory_name$''fileName$'
-    fileNameNoWav$ = fileName$ - ".wav"
+    fileNameNoWav$ = fileName$ - sound_file_extension$
     soundName$ = directory_name$ + fileName$ - sound_file_extension$
     csvName$ = soundName$ + ".csv"
     textGridname$ = soundName$ + ".TextGrid"
@@ -684,7 +684,7 @@ procedure findLabels
 
   theTextGrid$ = selected$("TextGrid")
   beginPause: "Check labels"
-    comment: "The following labels were found in the TextGrid for file: 'theTextGrid$'.wav"
+    comment: "The following labels were found in the TextGrid for file: 'theTextGrid$''sound_file_extension$'"
     comment: "Is this correct? If so, continue, if not, stop and fix your TextGrid."
     for lab to labconds
       thisone$ = labcond'lab'$
