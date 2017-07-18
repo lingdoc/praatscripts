@@ -779,7 +779,7 @@ procedure drawPitch
   	positive: "Maximum pitch for drawing", maximum_pitch_for_drawing
   	positive: "Hz time step", hz_time_step
   	positive: "Seconds time step", seconds_time_step
-  	comment: "Output files:"
+  	comment: "Output files (image, datafile):"
   	text: "Picture file", picture_file$
   	text: "Pitch data file", pitch_data_file$
   clicked = endPause: "Stop", "Continue", 2, 1
