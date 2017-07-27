@@ -791,44 +791,55 @@ procedure drawPitch
     ; else
     ;   sound_file_directory$ = soundDir$
     ; endif
-    if normalize_time = 0
-      normalize_time = 0
+    if fileReadable (sound_file_directory$)
+      ; do nothing
+      if normalize_time = 0
+        normalize_time = 0
+      else
+        normalize_time = 1
+      endif
+      if frequency_scale_for_the_picture = 1
+        frequency_scale_for_the_picture = 1
+      elsif frequency_scale_for_the_picture = 2
+        frequency_scale_for_the_picture = 2
+      elsif frequency_scale_for_the_picture = 3
+        frequency_scale_for_the_picture = 3
+      elsif frequency_scale_for_the_picture = 4
+        frequency_scale_for_the_picture = 4
+      else
+        frequency_scale_for_the_picture = 5
+      endif
+      if draw_as = 1
+        draw_as = 1
+      elsif draw_as = 2
+        draw_as = 2
+      else
+        draw_as = 3
+      endif
+      if line_style = 1
+        line_style = 1
+      elsif line_style = 2
+        line_style = 2
+      else
+        line_style = 3
+      endif
+      if smooth_pitch_curves = 0
+        smooth_pitch_curves = 0
+      else
+        smooth_pitch_curves = 1
+      endif
+      # do nothing
     else
-      normalize_time = 1
+      beginPause: "Error!"
+        comment: "There was a problem with the sound file directory."
+      clicked = endPause: "Continue", 1, 1
+      if clicked = 1
+        ; exitScript ()
+      else
+        ; do nothing
+      endif
     endif
-    if frequency_scale_for_the_picture = 1
-      frequency_scale_for_the_picture = 1
-    elsif frequency_scale_for_the_picture = 2
-      frequency_scale_for_the_picture = 2
-    elsif frequency_scale_for_the_picture = 3
-      frequency_scale_for_the_picture = 3
-    elsif frequency_scale_for_the_picture = 4
-      frequency_scale_for_the_picture = 4
-    else
-      frequency_scale_for_the_picture = 5
-    endif
-    if draw_as = 1
-      draw_as = 1
-    elsif draw_as = 2
-      draw_as = 2
-    else
-      draw_as = 3
-    endif
-    if line_style = 1
-      line_style = 1
-    elsif line_style = 2
-      line_style = 2
-    else
-      line_style = 3
-    endif
-    if smooth_pitch_curves = 0
-      smooth_pitch_curves = 0
-    else
-      smooth_pitch_curves = 1
-    endif
-    # do nothing
   endif
-
 endproc
 
   # The optional pitch parameter file should be in the format:
@@ -849,7 +860,7 @@ procedure draw_and_plot
 	# You can also use this parameter to switch between different conditions, e.g., read/spontaneous speech.
 	# The example below will consider the first two characters of the filename as the group ID code.
 	# Edit and uncomment the next line, if you wish to use this option!
-	group_id$ = "left$ (filename$, 2)"
+	group_id$ = "left$ (filename$, 4)"
 
 	# Pitch smoothing:
 	smoothing_by_bandwidth = 10
@@ -937,6 +948,7 @@ procedure draw_and_plot
 	; colour$ = "Black"
 	colour$ = "Red"
 	style = 0
+  style$ = "Plain"
 	maxduration = 0
 	minfreq = minimum_pitch_for_drawing
 	maxfreq = maximum_pitch_for_drawing
@@ -1083,9 +1095,9 @@ procedure reset
 
 	beginPause: "Adjust parameters"
     comment: "File parameters (directory, image, datafile):"
-    text: "Sound file directory", wav_folder$
-    text: "Picture file", image_file$
-    text: "Pitch data file", data_file$
+    text: "Wav folder", wav_folder$
+    text: "Image file", image_file$
+    text: "Data file", data_file$
     boolean: "Normalize time", normalize_time
   	optionMenu: "Frequency scale for the picture", frequency_scale_for_the_picture
   		option: "Linear (Hertz)"
@@ -1117,57 +1129,114 @@ procedure reset
     # react to cancel
     exitScript ()
   elsif clicked = 2
-		sound_file_directory$ = wav_folder$
-		picture_file$ = image_file$
-		pitch_data_file$ = data_file$
-		minimum_pitch_for_drawing = minimum_pitch
-		maximum_pitch_for_drawing = maximum_pitch
-		hz_time_step = hz_markers
-		seconds_time_step = seconds_markers
-    if redraw_pitch = 0
-      pitch_redraw = 0
+    if fileReadable (wav_folder$)
+  		sound_file_directory$ = wav_folder$
+  		picture_file$ = image_file$
+  		pitch_data_file$ = data_file$
+  		minimum_pitch_for_drawing = minimum_pitch
+  		maximum_pitch_for_drawing = maximum_pitch
+  		hz_time_step = hz_markers
+  		seconds_time_step = seconds_markers
+      if redraw_pitch = 0
+        pitch_redraw = 0
+      else
+        pitch_redraw = 1
+      endif
+      if normalize_time = 0
+        normalize_time = 0
+      else
+        normalize_time = 1
+      endif
+      if frequency_scale_for_the_picture = 1
+        frequency_scale_for_the_picture = 1
+      elsif frequency_scale_for_the_picture = 2
+        frequency_scale_for_the_picture = 2
+      elsif frequency_scale_for_the_picture = 3
+        frequency_scale_for_the_picture = 3
+      elsif frequency_scale_for_the_picture = 4
+        frequency_scale_for_the_picture = 4
+      else
+        frequency_scale_for_the_picture = 5
+      endif
+      if draw_as = 1
+        draw_as = 1
+      elsif draw_as = 2
+        draw_as = 2
+      else
+        draw_as = 3
+      endif
+      if line_style = 1
+        line_style = 1
+      elsif line_style = 2
+        line_style = 2
+      else
+        line_style = 3
+      endif
+      if smooth_pitch_curves = 0
+        smooth_pitch_curves = 0
+      else
+        smooth_pitch_curves = 1
+      endif
+      call draw_and_plot
     else
-      pitch_redraw = 1
+  		sound_file_directory$ = wav_folder$
+  		picture_file$ = image_file$
+  		pitch_data_file$ = data_file$
+  		minimum_pitch_for_drawing = minimum_pitch
+  		maximum_pitch_for_drawing = maximum_pitch
+  		hz_time_step = hz_markers
+  		seconds_time_step = seconds_markers
+      if redraw_pitch = 0
+        pitch_redraw = 0
+      else
+        pitch_redraw = 1
+      endif
+      if normalize_time = 0
+        normalize_time = 0
+      else
+        normalize_time = 1
+      endif
+      if frequency_scale_for_the_picture = 1
+        frequency_scale_for_the_picture = 1
+      elsif frequency_scale_for_the_picture = 2
+        frequency_scale_for_the_picture = 2
+      elsif frequency_scale_for_the_picture = 3
+        frequency_scale_for_the_picture = 3
+      elsif frequency_scale_for_the_picture = 4
+        frequency_scale_for_the_picture = 4
+      else
+        frequency_scale_for_the_picture = 5
+      endif
+      if draw_as = 1
+        draw_as = 1
+      elsif draw_as = 2
+        draw_as = 2
+      else
+        draw_as = 3
+      endif
+      if line_style = 1
+        line_style = 1
+      elsif line_style = 2
+        line_style = 2
+      else
+        line_style = 3
+      endif
+      if smooth_pitch_curves = 0
+        smooth_pitch_curves = 0
+      else
+        smooth_pitch_curves = 1
+      endif
+      beginPause: "Error!"
+        comment: "There was a problem with the sound file directory."
+      clicked = endPause: "Continue", 1, 1
+      if clicked = 1
+        ; exitScript ()
+      else
+        ; do nothing
+      endif
     endif
-    if normalize_time = 0
-      normalize_time = 0
-    else
-      normalize_time = 1
-    endif
-    if frequency_scale_for_the_picture = 1
-      frequency_scale_for_the_picture = 1
-    elsif frequency_scale_for_the_picture = 2
-      frequency_scale_for_the_picture = 2
-    elsif frequency_scale_for_the_picture = 3
-      frequency_scale_for_the_picture = 3
-    elsif frequency_scale_for_the_picture = 4
-      frequency_scale_for_the_picture = 4
-    else
-      frequency_scale_for_the_picture = 5
-    endif
-    if draw_as = 1
-      draw_as = 1
-    elsif draw_as = 2
-      draw_as = 2
-    else
-      draw_as = 3
-    endif
-    if line_style = 1
-      line_style = 1
-    elsif line_style = 2
-      line_style = 2
-    else
-      line_style = 3
-    endif
-    if smooth_pitch_curves = 0
-      smooth_pitch_curves = 0
-    else
-      smooth_pitch_curves = 1
-    endif
-
-		call draw_and_plot
   endif
-
+  ;
 endproc
 
 # This procedure runs a simple duration query for the pitch track.
@@ -1178,7 +1247,7 @@ duration = Get duration
 if duration > maxduration
 	maxduration = duration
 endif
-
+;
 endproc
 
 # This procedure actually plots the pitches.
@@ -1364,25 +1433,32 @@ procedure SwitchLineStyles
 if style = 1
 	Line width... 3
 	Plain line
+  style$ = "Plain"
 elsif style = 2
 	Line width... 3
 	Dashed line
+  style$ = "Dashed"
 elsif style = 3
 	Line width... 3
 	Dotted line
+  style$ = "Dotted"
 elsif style = 4
 	Line width... 5
 	Plain line
+  style$ = "Heavy Plain"
 elsif style = 5
 	Line width... 5
 	Dashed line
+  style$ = "Heavy Dashed"
 elsif style = 6
 	Line width... 5
 	Dotted line
+  style$ = "Heavy Dotted"
 else
 	style = 1
 	Line width... 3
 	Plain line
+  style$ = "Plain"
 endif
 
 endproc
@@ -1438,7 +1514,8 @@ procedure SaveStatistics
 		...	'stdev'
 		...	'min_pitch'
 		...	'max_pitch'
-		...	'colour$'"
+		...	'colour$'
+		...	'style$'"
 	if group_id$ <> ""
 		resultline$ = resultline$ + "	" + condition$ + newline$
 	else
@@ -1446,7 +1523,7 @@ procedure SaveStatistics
 	endif
 	fileappend 'pitch_data_file$' 'resultline$'
 
-	printline 'filename$': 'condition$' 'colour$' (dur 'dur' s)
+	printline 'filename$': 'condition$' 'colour$' 'style$' (dur 'dur' s)
   if smooth_pitch_curves = 1
     Remove
     select 'pitchID3'
@@ -1505,6 +1582,7 @@ procedure GetConditionFromFilename
 		if line_style = 1
 			call SwitchColours
 		elsif line_style = 2
+      colour$ = "Black"
 			call SwitchLineStyles
 		endif
 	endif
