@@ -984,6 +984,7 @@ procedure draw_and_plot
 	endfor
 
 	hz_time_step_semitones = hz_time_step/10
+  norm_time_step = seconds_time_step
 
 	if frequency_scale_for_the_picture = 1
 		Text left... yes Pitch (Hz)
@@ -1006,8 +1007,8 @@ procedure draw_and_plot
 	endif
 
 	if normalize_time = 1
-		Text bottom... yes Normalized time (seconds)
-		Marks bottom every... 1.0 seconds_time_step yes yes yes
+		Text bottom... yes Normalized time (percent)
+		Marks bottom every... xmax norm_time_step yes yes yes
 	else
 		Text bottom... yes Time (seconds)
 		Marks bottom every... 1.0 seconds_time_step yes yes yes
