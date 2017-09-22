@@ -63,31 +63,56 @@ pitch_redraw = 1
 if analysis_type = 1
   # do nothing
   call makeWAVs
+  sound_file_directory$ = "'newDir$'"
+  picture_file$ = "'directory_name$''fileNameNoWav$'.png"
+  pitch_data_file$ = "'directory_name$''fileNameNoWav$'.txt"
 elsif analysis_type = 2
   # do nothing
   call makeWAVs
+  sound_file_directory$ = "'newDir$'"
+  picture_file$ = "'directory_name$''fileNameNoWav$'.png"
+  pitch_data_file$ = "'directory_name$''fileNameNoWav$'.txt"
+elsif analysis_type = 3
+  ; call analyzeNorm
+  call makeWAVs
+  sound_file_directory$ = "'newDir$'"
+  picture_file$ = "'directory_name$''fileNameNoWav$'_norm.png"
+  pitch_data_file$ = "'directory_name$''fileNameNoWav$'_norm.txt"
+elsif analysis_type = 4
+  ; call findLabels
+  ; call analyzeNormTone
+  call makeWAVs
+  sound_file_directory$ = "'normDir$'"
+  picture_file$ = "'directory_name$''fileNameNoWav$'_'label$'_norm.png"
+  pitch_data_file$ = "'directory_name$''fileNameNoWav$'_'label$'_norm.txt"
 elsif analysis_type = 5
   normDir$ = directory_name$
   newDir$ = directory_name$
   fileNameNoWav$ = "File"
   label$ = "Label"
+  sound_file_directory$ = "'normDir$'"
+  picture_file$ = "'directory_name$''fileNameNoWav$'_'label$'_norm.png"
+  pitch_data_file$ = "'directory_name$''fileNameNoWav$'_'label$'_norm.txt"
   call drawPitch
   the_loop = 1
 
   while the_loop = 1
     call reset
+    call draw_and_plot
   endwhile
 else
-  call makeWAVs
-  call drawPitch
-  call draw_and_plot
-
-  the_loop = 1
-
-  while the_loop = 1
-    call reset
-  endwhile
+  ; call makeWAVs
 endif
+
+call drawPitch
+call draw_and_plot
+
+the_loop = 1
+
+while the_loop = 1
+  call reset
+  call draw_and_plot
+endwhile
 
 # End of main script. The rest of the script defines procedures.
 
@@ -659,9 +684,11 @@ endproc
 procedure drawPitch
   ; sound_file_extension$ = ".wav"
   pitch_file_extension$ = ".Pitch"
+  image_file$ = picture_file$
+  data_file$ = pitch_data_file$
   time_step = 0.01
-  default_minimum_pitch = 60
-  default_maximum_pitch = 400
+  default_minimum_pitch = f0_minimum
+  default_maximum_pitch = f0_maximum
   pitch_parameter_file$ = ""
   minimum_pitch_for_drawing = 50
   maximum_pitch_for_drawing = 200
@@ -673,38 +700,12 @@ procedure drawPitch
   line_style = 1
   smooth_pitch_curves = 0
 
-  if analysis_type = 1
-    ; call analyzeRaw
-    sound_file_directory$ = "'newDir$'"
-    picture_file$ = "'directory_name$''fileNameNoWav$'.png"
-    pitch_data_file$ = "'directory_name$''fileNameNoWav$'.txt"
-  elsif analysis_type = 2
-    ; call analyzePerc
-    sound_file_directory$ = "'newDir$'"
-    picture_file$ = "'directory_name$''fileNameNoWav$'.png"
-    pitch_data_file$ = "'directory_name$''fileNameNoWav$'.txt"
-  elsif analysis_type = 3
-    ; call analyzeNorm
-    sound_file_directory$ = "'newDir$'"
-    picture_file$ = "'directory_name$''fileNameNoWav$'_norm.png"
-    pitch_data_file$ = "'directory_name$''fileNameNoWav$'_norm.txt"
-  elsif analysis_type = 4
-    ; call findLabels
-    ; call analyzeNormTone
-    sound_file_directory$ = "'normDir$'"
-    picture_file$ = "'directory_name$''fileNameNoWav$'_'label$'_norm.png"
-    pitch_data_file$ = "'directory_name$''fileNameNoWav$'_'label$'_norm.txt"
-  elsif analysis_type = 5
-    ; call findLabels
-    ; call analyzeNormTone
-    sound_file_directory$ = "'normDir$'"
-    picture_file$ = "'directory_name$''fileNameNoWav$'_'label$'_norm.png"
-    pitch_data_file$ = "'directory_name$''fileNameNoWav$'_'label$'_norm.txt"
-  endif
-
   beginPause: "Draw pitch curves from all sound files in a directory"
   	comment: "Sound file directory (use '*_norm' to plot normalized):"
   	text: "Sound file directory", sound_file_directory$
+  	; comment: "Output files:"
+  	text: "Image file", image_file$
+  	text: "Data file", data_file$
   	; sentence: "Sound file extension", sound_file_extension$
   	; sentence: "Pitch file extension", pitch_file_extension$
   	boolean: "Normalize time", normalize_time
@@ -735,9 +736,6 @@ procedure drawPitch
   	positive: "Maximum pitch for drawing", maximum_pitch_for_drawing
   	positive: "Hz time step", hz_time_step
   	positive: "Seconds time step", seconds_time_step
-  	comment: "Output files:"
-  	text: "Picture file", picture_file$
-  	text: "Pitch data file", pitch_data_file$
   clicked = endPause: "Stop", "Continue", 2, 1
   if clicked = 1
     exitScript ()
@@ -747,6 +745,10 @@ procedure drawPitch
     ; else
     ;   sound_file_directory$ = soundDir$
     ; endif
+    f0_minimum = default_minimum_pitch
+    f0_maximum = default_maximum_pitch
+    picture_file$ = image_file$
+    pitch_data_file$ = data_file$
     if normalize_time = 0
       normalize_time = 0
     else
@@ -1041,8 +1043,8 @@ procedure reset
 	beginPause: "Adjust parameters"
     comment: "File parameters (directory, image, datafile):"
     text: "Sound file directory", wav_folder$
-    text: "Picture file", image_file$
-    text: "Pitch data file", data_file$
+    text: "Image file", image_file$
+    text: "Data file", data_file$
     boolean: "Normalize time", normalize_time
   	optionMenu: "Frequency scale for the picture", frequency_scale_for_the_picture
   		option: "Linear (Hertz)"
@@ -1074,10 +1076,10 @@ procedure reset
     # react to cancel
     exitScript ()
   elsif clicked = 2
-		sound_file_directory$ = wav_folder$
-		picture_file$ = image_file$
-		pitch_data_file$ = data_file$
-		minimum_pitch_for_drawing = minimum_pitch
+    sound_file_directory$ = wav_folder$
+    picture_file$ = image_file$
+    pitch_data_file$ = data_file$
+    minimum_pitch_for_drawing = minimum_pitch
 		maximum_pitch_for_drawing = maximum_pitch
 		hz_time_step = hz_markers
 		seconds_time_step = seconds_markers
@@ -1122,7 +1124,6 @@ procedure reset
       smooth_pitch_curves = 1
     endif
 
-		call draw_and_plot
   endif
 
 endproc
