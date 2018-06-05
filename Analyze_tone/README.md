@@ -68,10 +68,6 @@ Crucially, options for the second process are constrained by the user's choice i
 
 ###### The *"Percentage increments"* value is used by both *'Normalize'* options.
 
-The user is also able to choose whether to resample the audio. Resampling is done for LPC analysis, to make sure all sound files have the same specs. If your computer can handle higher sample rates, such as 44.1 kHz, and your sound files are already in that format, the default of 'No' can be used. Skipping resampling will speed up the script processing, so you can view your data sooner.
-
-The *"Sample rate"* of 22000 samples/sec (22kHz) is a good rate for most analyses, as higher sample rates don't necessarily improve the analysis of speech (rates above 16kHz are recommended). Increasing the sample rate may increase processing time, but can be worth playing around with for your particular use case, especially if you have lots of processing power. The quality level of the resampling (50) is the Praat default.
-
 There are various form windows that pop up to query the user. Some deal with overwriting files. If you have selected one of the **Normalize** options, you will be shown a follow-up window that tells you what the unique *label* values are in your script. This can help you fix issues or errors in transcription within the script, or indicate that you are not analyzing the correct tier of the TextGrid.
 
 In the two **Normalize** options, folders are automatically created to store new WAV files for plotting in the Praat drawing window. The base folder created has the same name as the sound file that the script has analyzed. So if a file (with corresponding TextGrid) is named *'Speaker01'*, the labeled tonal segments will all be placed in a subfolder named *'Speaker01/'*.
