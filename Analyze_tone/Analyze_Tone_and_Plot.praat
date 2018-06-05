@@ -50,12 +50,6 @@ form Extract Pitch data from labeled points
   comment Pitch Settings (m 75-300, f 100-500):
   positive F0_minimum 75
   positive F0_maximum 500
-  comment Resample settings:
-  choice Resample: 2
-    button Yes
-    button No
-  positive Sample_rate 22000
-  positive Sampling_quality 50
 endform
 
 pitch_redraw = 1
@@ -133,13 +127,6 @@ procedure makeWAVs
     select Sound 'fileNameNoWav$'
   	soundID1 = selected("Sound")
     soundID1$ = selected$("Sound")
-  	if resample$ = "Yes"
-  		Resample... sample_rate sampling_quality
-      soundID1 = selected("Sound")
-      soundID1$ = selected$("Sound")
-  	else
-  		# do nothing
-  	endif
 
     if fileReadable (soundName$+".TextGrid")
       Read from file... 'directory_name$''soundID1$'.TextGrid
