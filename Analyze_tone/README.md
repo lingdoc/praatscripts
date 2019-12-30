@@ -21,7 +21,7 @@ Based in part on Praat scripts by Christian DiCanio, 2012 & 2013: <http://www.ac
 
 ## Detailed description
 
-This script has two main processes, the **segmentation/analysis** process and the **drawing** process.
+This script has two main processes, the [**segmentation/analysis**](###segmentation-and-analysis) process and the [**drawing**](###drawing) process. [**Common issues**](###common-issues) are also described below.
 
 ### Segmentation and Analysis:
 
@@ -83,3 +83,15 @@ If the user chose the first Normalize option in the previous window (Normalize f
 If the user chose the second **Normalize** option in the previous window (*Normalize by tone for Drawing*), the *'Sound file directory'* field defaults to the normalized subdirectory of the most recently analyzed audio file (i.e. *'Speaker01/Speaker01_norm/'* from our example above). To plot the individual plot traces from each labeled segment, the user will need to change the directory to the respective directory that contains the segments the user wants to plot.
 
 Fortunately, the **Drawing** window will repeat after every drawing. This allows the user to fine-tune their analysis, draw a different set of tone files, and output new drawings with different settings or overwrite previous pictures that they created.
+
+### Common Issues
+
+The QAs below try to answer some of the basic questions/concerns of users of this script. If the below answers do not help you solve your problem, please check the open and closed issues in this repository ([HERE](https://github.com/lingdoc/praatscripts/issues/1) for example). Otherwise you can open a new issue and I will try to help.
+
+1. **I'm not getting any plots!**
+
+ The first thing to check is whether your soundfiles and annotation files are named in a Praat-friendly way, without odd/math characters. Also, the script's tonal analysis is sensitive to several things, including quality of data, number of samples per label, and continuity of pitch in the labeled segments. If you are starting out with a small sample of labeled data, make sure that the tier you have labeled is indicated in the first window, that any given label has more than one instance in the TextGrid, and that each labeled segment is constrained to where the pitch is visually perceptible and continuous in the Praat visualization. A final concern is whether the automatic pitch identification is correctly constrained to the range of your sample - a smaller pitch range may be more helpful for your particular sample. These issues largely disappear when working with more data (10-20 instances per label in a given soundfile/TextGrid pair).
+
+2. **I keep seeing additional lines in my plots!**
+
+ This may be an issue if you have made adjustments to your data or annotations (TextGrids) that change the number of labels. The first run of the script will create a single subfolder for each WAV/TextGrid pair in the folder, but subsequent runs do not overwrite this folder, only the contained files with the same names. This means that previous label files will remain in the folder and be included in plots. To force a new analysis, simply delete the subfolder(s) and re-run the script.
